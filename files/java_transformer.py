@@ -52,9 +52,13 @@ from transformers.org_omg_jmx_rmi_stub_transform import OMGJMXRMIStubTransformer
 from transformers.sending_context_transform import SendingContextTransformer
 from transformers.portable_server_transform import PortableServerTransformer
 from transformers.portable_server_portable_transform import PortableServerPortableTransformer
+from transformers.portable_interceptor_transform import PortableInterceptorTransformer
+from transformers.current_package_transform import CurrentPackageTransformer
+from transformers.poa_manager_package_transform import POAManagerPackageTransformer
+from transformers.poa_package_transform import POAPackageTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
-
+from transformers.servant_locator_package_transform import ServantLocatorPackageTransformer
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
         self.verbose   = verbose
@@ -69,6 +73,11 @@ class JavaTransformer:
             SendingContextTransformer(),
             PortableServerTransformer(),
             PortableServerPortableTransformer(),
+            PortableInterceptorTransformer(),
+            CurrentPackageTransformer(),
+            POAManagerPackageTransformer(),
+            POAPackageTransformer(),
+            ServantLocatorPackageTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             FinalizeTransformer(),
