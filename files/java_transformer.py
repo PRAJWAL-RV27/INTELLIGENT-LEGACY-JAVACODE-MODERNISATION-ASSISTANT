@@ -47,6 +47,11 @@ from transformers.jaxb_util_removal import JAXBUtilRemovalTransformer
 from transformers.jaxb_bind_transform import JAXBBindTransformer
 from transformers.soap_transform import SOAPTransformer
 from transformers.jaxws_soap_handler_transform import JAXWSSOAPHandlerTransformer
+from transformers.org_omg_rmi_stub_transform import OMGRMIStubTransformer
+from transformers.org_omg_jmx_rmi_stub_transform import OMGJMXRMIStubTransformer
+from transformers.sending_context_transform import SendingContextTransformer
+from transformers.portable_server_transform import PortableServerTransformer
+from transformers.portable_server_portable_transform import PortableServerPortableTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
 
@@ -59,6 +64,11 @@ class JavaTransformer:
             JAXBBindTransformer(),
             SOAPTransformer(),
             JAXWSSOAPHandlerTransformer(),
+            OMGRMIStubTransformer(),
+            OMGJMXRMIStubTransformer(),
+            SendingContextTransformer(),
+            PortableServerTransformer(),
+            PortableServerPortableTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             FinalizeTransformer(),
