@@ -1,0 +1,67 @@
+import re
+
+
+class ServantLocatorPackageTransformer:
+    """
+    Transformer for:
+
+        import org.omg.PortableInterceptor.*
+
+    Removed from JDK in Java 11 (JEP 320).
+    """
+
+    IMPORT_PATTERN = re.compile(
+       r'^\s*import\s+org\.omg\.PortableServer\.ServantLocatorPackage\.([A-Za-z_][A-Za-z0-9_]*)\s*;',
+       re.MULTILINE
+    )
+
+    def transform(self, content: str):
+
+        changes = []
+        imported_classes = []
+
+        matches = list(self.IMPORT_PATTERN.finditer(content))
+
+        for match in reversed(matches):
+
+            class_name = match.group(1)
+            imported_classes.append(class_name)
+
+            replacement = (
+                "// ==========================================================\n"
+                "// TODO(Java21)\n"
+                "// org.omg.PortableInterceptor removed in Java 11.\n"
+                "// JEP 320 : Remove the Java EE and CORBA Modules.\n"
+                "// Manual migration required.\n"
+                "//\n"
+                f"// {match.group(0).strip()}\n"
+                "// ==========================================================\n"
+            )
+
+            content = (
+                content[:match.start()]
+                + replacement
+                + content[match.end():]
+            )
+
+            changes.append(
+                f"Removed ServantLocatorPackage import '{class_name}'."
+            )
+
+        for class_name in imported_classes:
+
+            usage_pattern = re.compile(r"\b" + re.escape(class_name) + r"\b")
+
+            for occurrence in usage_pattern.finditer(content):
+
+                line_number = content[:occurrence.start()].count("\n") + 1
+                line_text = content.splitlines()[line_number - 1].strip()
+
+                if line_text.startswith("//"):
+                    continue
+
+                changes.append(
+                    f"Manual migration required: '{class_name}' used at line {line_number}."
+                )
+
+        return content, changes
