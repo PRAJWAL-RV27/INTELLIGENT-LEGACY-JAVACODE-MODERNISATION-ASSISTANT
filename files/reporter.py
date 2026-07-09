@@ -53,3 +53,35 @@ class Reporter:
                 print(f"    ✅  {r.path}")
 
         print("=" * 60)
+
+    def get_summary_text(self, dry_run: bool = False) -> str:
+        """Return the summary as a string."""
+        total     = len(self._reports)
+        changed   = [r for r in self._reports if r.changed]
+        unchanged = [r for r in self._reports if not r.changed]
+
+        lines = []
+        lines.append("=" * 60)
+        lines.append("  TRANSFORMATION SUMMARY")
+        lines.append("=" * 60)
+        lines.append(f"  Total files processed : {total}")
+        lines.append(f"  Files modified        : {len(changed)}")
+        lines.append(f"  Files unchanged       : {len(unchanged)}")
+
+        if dry_run:
+            lines.append("\n  ⚠  DRY RUN — no files were written to disk.")
+
+        if changed:
+            lines.append(f"\n  Modified files:")
+            for r in changed:
+                lines.append(f"\n    📄  {r.path}")
+                for c in r.changes:
+                    lines.append(f"          • {c}")
+
+        if unchanged and self.verbose:
+            lines.append(f"\n  Unchanged files:")
+            for r in unchanged:
+                lines.append(f"    ✅  {r.path}")
+
+        lines.append("=" * 60)
+        return "\n".join(lines)

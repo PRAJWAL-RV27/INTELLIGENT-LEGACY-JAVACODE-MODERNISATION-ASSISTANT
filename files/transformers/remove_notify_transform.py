@@ -1,42 +1,51 @@
 import re
+from .base_transformer import BaseTransformer
 
-class RemoveNotifyTransformer:
+
+class RemoveNotifyTransformer(BaseTransformer):
     def transform(self, content: str):
         changes = []
 
-        # Find all classes
         class_pattern = r'class\s+\w+[^{]*\{'
-        class_matches = list(re.finditer(class_pattern, content))
+        # removeNotify with NO parameters (no-arg override)
+        method_header = r'\b(public|protected)\s+void\s+removeNotify\s*\(\s*\)\s*\{'
 
-        # Find removeNotify methods
-        method_pattern = r'\b(public|protected)\s+void\s+removeNotify\s*\(\s*\)\s*\{([\s\S]*?)\}'
-        method_matches = list(re.finditer(method_pattern, content))
+        while True:
+            method_match = re.search(method_header, content)
+            if not method_match:
+                break
 
-        for match in reversed(method_matches):
-            original_body = match.group(2)
+            # Balanced-brace extraction
+            brace_start = content.index('{', method_match.start())
+            depth, i = 0, brace_start
+            while i < len(content):
+                if content[i] == '{':
+                    depth += 1
+                elif content[i] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        break
+                i += 1
+            method_end = i + 1
+            original_body = content[brace_start + 1:i]
 
-            # Clean body (remove super call)
+            # Remove super call from body
             cleaned_body = re.sub(
                 r'super\.removeNotify\s*\(\s*\)\s*;', '', original_body
             ).strip()
 
-            # Remove entire method always
-            content = content[:match.start()] + content[match.end():]
+            # Remove entire method
+            content = content[:method_match.start()] + content[method_end:]
 
-            # ---------- CASE 1: ONLY super.removeNotify() ----------
             if cleaned_body == "":
                 changes.append("Removed redundant removeNotify() (only super call)")
                 continue
 
-            # ---------- CASE 2: HAS REAL LOGIC ----------
-            insert_pos = None
-            for cls in reversed(class_matches):
-                if cls.start() < match.start():
-                    insert_pos = cls.end()
-                    break
-
-            if insert_pos is None:
+            # Re-locate class insert position after mutation
+            class_match = re.search(class_pattern, content)
+            if not class_match:
                 continue
+            insert_pos = class_match.end()
 
             new_method = f"""
 
@@ -47,7 +56,6 @@ class RemoveNotifyTransformer:
         {cleaned_body}
     }}
 """
-
             content = content[:insert_pos] + new_method + content[insert_pos:]
             changes.append("Converted removeNotify() to cleanupResources()")
 

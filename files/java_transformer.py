@@ -47,6 +47,9 @@ from transformers.jaxb_util_removal import JAXBUtilRemovalTransformer
 from transformers.jaxb_bind_transform import JAXBBindTransformer
 from transformers.soap_transform import SOAPTransformer
 from transformers.jaxws_soap_handler_transform import JAXWSSOAPHandlerTransformer
+from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
+from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
+
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
         self.verbose   = verbose
@@ -67,6 +70,8 @@ class JavaTransformer:
             RemoveNotifyComponentPeerTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
+            TextLayoutEqualsTransformer(),
+            TextLayoutHashCodeTransformer(),
             # Phase 2
             DiamondOperatorTransformer(),
             InstanceofPatternTransformer(),

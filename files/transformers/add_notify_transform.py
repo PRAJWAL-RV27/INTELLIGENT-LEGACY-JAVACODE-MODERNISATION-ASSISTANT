@@ -1,6 +1,7 @@
 import re
+from .base_transformer import BaseTransformer
 
-class AddNotifyTransformer:
+class AddNotifyTransformer(BaseTransformer):
     def transform(self, content: str):
         changes = []
 

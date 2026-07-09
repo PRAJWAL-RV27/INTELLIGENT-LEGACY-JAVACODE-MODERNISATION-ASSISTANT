@@ -3,54 +3,26 @@ from .base_transformer import BaseTransformer
 
 class JAXBHelpersRemovalTransformer(BaseTransformer):
 
-    def transform(self, content: str):
-        changes = []
-        original = content
+    def transform(self, content: str) -> tuple[str, list[str]]:
+        changes: list[str] = []
 
-        # 1. Remove helpers import
+        # 1. Replace helpers package with jakarta
         new_content = re.sub(
-            r'import\s+javax\.xml\.bind\.helpers\..*;\n?',
-            '',
+            r'import\s+javax\.xml\.bind\.helpers\.',
+            'import jakarta.xml.bind.helpers.',
             content
         )
         if new_content != content:
-            changes.append("Removed javax.xml.bind.helpers import")
+            changes.append("Replaced javax.xml.bind.helpers with jakarta.xml.bind.helpers")
         content = new_content
 
-        # 2. Replace javax.xml.bind → jakarta.xml.bind
-        new_content = re.sub(
-            r'import\s+javax\.xml\.bind\.',
-            'import jakarta.xml.bind.',
-            content
-        )
-        if new_content != content:
-            changes.append("Replaced javax.xml.bind with jakarta.xml.bind")
-        content = new_content
-
-        # 3. Replace Base64 encode
-        new_content = re.sub(
-            r'DatatypeConverter\.printBase64Binary\((.*?)\)',
-            r'Base64.getEncoder().encodeToString(\1)',
-            content
-        )
-        if new_content != content:
-            changes.append("Replaced DatatypeConverter.printBase64Binary with Base64 encoder")
-        content = new_content
-
-        # 4. Replace Base64 decode
-        new_content = re.sub(
-            r'DatatypeConverter\.parseBase64Binary\((.*?)\)',
-            r'Base64.getDecoder().decode(\1)',
-            content
-        )
-        if new_content != content:
-            changes.append("Replaced DatatypeConverter.parseBase64Binary with Base64 decoder")
-        content = new_content
-
-        # 5. Add Base64 import if needed
-        if ("Base64.getEncoder()" in content or "Base64.getDecoder()" in content):
-            if "import java.util.Base64;" not in content:
-                content = "import java.util.Base64;\n" + content
-                changes.append("Added import java.util.Base64")
+        # 2. Add migration comment if JAXB helpers are used
+        if "jakarta.xml.bind.helpers" in content:
+            if "JAXB helpers requires dependency" not in content:
+                content = (
+                    "// JAVA21-MIGRATION: Add dependency: jakarta.xml.bind:jakarta.xml.bind-api\n"
+                    + content
+                )
+                changes.append("Added JAXB helpers dependency comment")
 
         return content, changes

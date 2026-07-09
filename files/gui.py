@@ -75,16 +75,30 @@ class TransformerGUI:
         # Input section
         input_frame = ctk.CTkFrame(main_frame, fg_color="#1e293b", corner_radius=15, border_width=2, border_color="#3b82f6")
         input_frame.pack(fill="x", pady=(0, 25))
-        ctk.CTkLabel(input_frame, text="📁 GitHub Source Folder", font=ctk.CTkFont(size=20, weight="bold"), text_color="white").pack(pady=(15, 15), padx=20, anchor="w")
+        ctk.CTkLabel(input_frame, text="📁 Source Folder / GitHub URL", font=ctk.CTkFont(size=20, weight="bold"), text_color="white").pack(pady=(15, 15), padx=20, anchor="w")
 
         # Source
         source_frame = ctk.CTkFrame(input_frame, fg_color="transparent")
         source_frame.pack(fill="x", padx=20, pady=(0, 15))
-        ctk.CTkLabel(source_frame, text="GitHub Folder URL:", font=ctk.CTkFont(weight="bold", size=13), text_color="#e2e8f0").pack(anchor="w", pady=(0, 8))
-        self.source_entry = ctk.CTkEntry(source_frame, placeholder_text="https://github.com/owner/repo/tree/main/path/to/folder", height=45, font=ctk.CTkFont(size=12), text_color="white")
+        ctk.CTkLabel(source_frame, text="Enter a GitHub folder URL or a local folder path:", font=ctk.CTkFont(weight="bold", size=13), text_color="#e2e8f0").pack(anchor="w", pady=(0, 8))
+        self.source_entry = ctk.CTkEntry(
+            source_frame,
+            placeholder_text="Paste a GitHub folder URL or choose a local folder",
+            height=50,
+            font=ctk.CTkFont(size=13),
+            text_color="white",
+            fg_color="#0f172a",
+            border_color="#475569",
+            corner_radius=10,
+        )
         self.source_entry.pack(fill="x", pady=(0, 10))
-        self.source_btn = ctk.CTkButton(source_frame, text="📥 Load GitHub Source", command=self.select_source, fg_color="#0891b2", hover_color="#0e7490", text_color="white", font=ctk.CTkFont(size=13, weight="bold"), height=40, corner_radius=8)
-        self.source_btn.pack(fill="x")
+
+        button_row = ctk.CTkFrame(source_frame, fg_color="transparent")
+        button_row.pack(fill="x")
+        self.source_btn = ctk.CTkButton(button_row, text="📥 Load Source", command=self.select_source, fg_color="#0891b2", hover_color="#0e7490", text_color="white", font=ctk.CTkFont(size=13, weight="bold"), height=40, corner_radius=8)
+        self.source_btn.pack(side="left", fill="x", expand=True, padx=(0, 10))
+        self.browse_local_btn = ctk.CTkButton(button_row, text="📂 Browse Local Folder", command=self.browse_local_source, fg_color="#475569", hover_color="#334155", text_color="white", font=ctk.CTkFont(size=13, weight="bold"), height=40, corner_radius=8)
+        self.browse_local_btn.pack(side="right", fill="x", expand=True)
 
         # Options
         options_frame = ctk.CTkFrame(input_frame, fg_color="transparent")
@@ -171,28 +185,46 @@ class TransformerGUI:
     def change_appearance_mode_event(self, new_appearance_mode: str):
         ctk.set_appearance_mode(new_appearance_mode)
 
+    def browse_local_source(self):
+        dir_path = filedialog.askdirectory(title="Select Local Source Folder")
+        if dir_path:
+            self.source_entry.delete(0, "end")
+            self.source_entry.insert(0, dir_path)
+            self.select_source()
+
     def select_source(self):
-        github_url = self.source_entry.get().strip()
-        if not github_url:
-            messagebox.showerror("Error", "Please enter a GitHub folder URL.")
+        source_value = self.source_entry.get().strip()
+        if not source_value:
+            messagebox.showerror("Error", "Please enter a GitHub folder URL or choose a local folder.")
             return
 
         try:
-            self.github_source_url = github_url
-            self.source_dir = prepare_source_from_github_url(github_url)
-            self.temp_source_dir = self.source_dir
-            self.source_entry.delete(0, "end")
-            self.source_entry.insert(0, github_url)
-            self.status_label.configure(text="✅ GitHub source folder loaded. Ready to transform.", text_color="#10b981")
+            if source_value.startswith(("http://", "https://")):
+                self.github_source_url = source_value
+                self.source_dir = prepare_source_from_github_url(source_value)
+                self.temp_source_dir = self.source_dir
+                self.source_entry.delete(0, "end")
+                self.source_entry.insert(0, source_value)
+                self.status_label.configure(text="✅ GitHub source folder loaded. Ready to transform.", text_color="#10b981")
+            else:
+                local_path = Path(source_value).expanduser().resolve()
+                if not local_path.exists() or not local_path.is_dir():
+                    raise FileNotFoundError("The selected local folder does not exist or is not a directory.")
+                self.github_source_url = None
+                self.source_dir = local_path
+                self.temp_source_dir = None
+                self.source_entry.delete(0, "end")
+                self.source_entry.insert(0, str(local_path))
+                self.status_label.configure(text="✅ Local source folder loaded. Ready to transform.", text_color="#10b981")
         except Exception as exc:
             self.source_dir = None
             self.temp_source_dir = None
             self.github_source_url = None
-            messagebox.showerror("Error", f"Failed to load GitHub source folder:\n{exc}")
+            messagebox.showerror("Error", f"Failed to load source folder:\n{exc}")
 
     def start_transformation(self):
         if not self.source_dir:
-            messagebox.showerror("Error", "Please load a GitHub source folder first.")
+            messagebox.showerror("Error", "Please load a source folder first.")
             return
         if not self.source_dir.exists() or not self.source_dir.is_dir():
             messagebox.showerror("Error", "The loaded source folder does not exist.")
