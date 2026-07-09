@@ -38,7 +38,6 @@ from transformers.finalize_transform     import FinalizeTransformer
 from transformers.drag_source_transform  import DragSourceContextTransformer
 from transformers.drag_source_context_peer_transform import DragSourceContextPeerTransformer
 from transformers.add_notify_transform   import AddNotifyTransformer
-from transformers.add_notify_transform   import AddNotifyTransformer
 from transformers.remove_notify_transform import RemoveNotifyTransformer
 from transformers.add_notify_component_peer_transform import AddNotifyComponentPeerTransformer
 from transformers.remove_notify_component_peer_transform import RemoveNotifyComponentPeerTransformer
@@ -54,6 +53,7 @@ from transformers.portable_server_transform import PortableServerTransformer
 from transformers.portable_server_portable_transform import PortableServerPortableTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
+from transformers.colormodel_finalize_transform import ColorModelFinalizeTransformer
 
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
@@ -72,6 +72,7 @@ class JavaTransformer:
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             FinalizeTransformer(),
+            ColorModelFinalizeTransformer(),
             DragSourceContextTransformer(),
             DragSourceContextPeerTransformer(),
             AddNotifyTransformer(),
