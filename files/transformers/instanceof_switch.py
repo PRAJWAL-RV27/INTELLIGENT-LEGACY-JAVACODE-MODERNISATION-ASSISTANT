@@ -3,23 +3,16 @@ instanceof_switch.py — JEP 441 (Java 21): Pattern Matching for switch.
 
 Converts multi-branch if/else-if instanceof chains into switch expressions.
 
-Before (old style)
-──────────────────
-    if (shape instanceof Circle c) {
-        return c.radius() * 2;
-    } else if (shape instanceof Rectangle r) {
-        return r.width() * r.height();
-    } else {
-        return 0;
-    }
+Handles TWO forms of instanceof branches:
 
-After (Java 21)
-───────────────
-    return switch (shape) {
-        case Circle c    -> c.radius() * 2;
-        case Rectangle r -> r.width() * r.height();
-        default          -> 0;
-    };
+  Form A — with pattern variable (already has Java 16 pattern matching):
+    if (obj instanceof Integer i) { return i * 2; }
+
+  Form B — without pattern variable (old style with cast inside):
+    if (obj instanceof Integer) { return (Integer) obj * 2; }
+
+For Form B, we auto-generate a pattern variable name from the type name
+(lowercase first letter) so the switch case can use it.
 
 Safety rules
 ────────────
@@ -27,7 +20,6 @@ Safety rules
   2. At least 2 instanceof branches required.
   3. Each branch body: EXACTLY ONE statement (return expr; or expr;).
   4. All branches consistently return-based or expression-based.
-  5. Branches scanned SEQUENTIALLY — else-if branches never re-processed.
 """
 import re
 from .base_transformer import BaseTransformer
@@ -69,7 +61,13 @@ def _indentation(source: str, pos: int) -> str:
     return ''.join(indent)
 
 
-_IF_INST_RE = re.compile(
+def _make_pvar(type_name: str) -> str:
+    """Generate a safe pattern variable name from a type name."""
+    return type_name[0].lower() + type_name[1:] if type_name else 'v'
+
+
+# Form A: if (var instanceof Type pvar) {
+_IF_INST_WITH_VAR = re.compile(
     r'\bif\s*\(\s*'
     r'(?P<var>\w+)\s+instanceof\s+'
     r'(?P<type>\w+(?:\.\w+)*)\s+'
@@ -78,7 +76,17 @@ _IF_INST_RE = re.compile(
     re.MULTILINE,
 )
 
-_ELSEIF_INST_RE = re.compile(
+# Form B: if (var instanceof Type) {   — no pattern variable
+_IF_INST_NO_VAR = re.compile(
+    r'\bif\s*\(\s*'
+    r'(?P<var>\w+)\s+instanceof\s+'
+    r'(?P<type>\w+(?:\.\w+)*)'
+    r'\s*\)\s*\{',
+    re.MULTILINE,
+)
+
+# else-if variants
+_ELSEIF_WITH_VAR = re.compile(
     r'\}\s*else\s+if\s*\(\s*'
     r'(?P<var>\w+)\s+instanceof\s+'
     r'(?P<type>\w+(?:\.\w+)*)\s+'
@@ -87,7 +95,46 @@ _ELSEIF_INST_RE = re.compile(
     re.MULTILINE,
 )
 
+_ELSEIF_NO_VAR = re.compile(
+    r'\}\s*else\s+if\s*\(\s*'
+    r'(?P<var>\w+)\s+instanceof\s+'
+    r'(?P<type>\w+(?:\.\w+)*)'
+    r'\s*\)\s*\{',
+    re.MULTILINE,
+)
+
 _ELSE_RE = re.compile(r'\}\s*else\s*\{', re.MULTILINE)
+
+
+def _match_if_inst(source: str, pos: int):
+    """
+    Try to match an if-instanceof at `pos`, preferring the with-pvar form.
+    Returns (match, has_pvar) or (None, False).
+    """
+    m_with = _IF_INST_WITH_VAR.search(source, pos)
+    m_without = _IF_INST_NO_VAR.search(source, pos)
+
+    # Pick the earliest match; if tied, prefer with-pvar
+    if m_with is None and m_without is None:
+        return None, False
+    if m_with is None:
+        return m_without, False
+    if m_without is None:
+        return m_with, True
+    if m_with.start() <= m_without.start():
+        return m_with, True
+    return m_without, False
+
+
+def _match_elseif_inst(source: str, pos: int):
+    """Try to match an else-if-instanceof at `pos`."""
+    m_with = _ELSEIF_WITH_VAR.match(source, pos)
+    m_without = _ELSEIF_NO_VAR.match(source, pos)
+    if m_with:
+        return m_with, True
+    if m_without:
+        return m_without, False
+    return None, False
 
 
 class InstanceofSwitchTransformer(BaseTransformer):
@@ -99,7 +146,7 @@ class InstanceofSwitchTransformer(BaseTransformer):
         scan_pos = 0
 
         while True:
-            m = _IF_INST_RE.search(content, scan_pos)
+            m, has_pvar = _match_if_inst(content, scan_pos)
             if not m:
                 break
 
@@ -108,7 +155,7 @@ class InstanceofSwitchTransformer(BaseTransformer):
                 continue
 
             chain_var = m.group('var')
-            replacement, orig_end, n_branches = self._try_convert(content, m, chain_var)
+            replacement, orig_end, n_branches = self._try_convert(content, m, has_pvar, chain_var)
 
             if replacement is None:
                 scan_pos = m.end()
@@ -128,42 +175,65 @@ class InstanceofSwitchTransformer(BaseTransformer):
 
         return result, changes
 
-    def _try_convert(self, source: str, first_match: re.Match, chain_var: str) -> tuple[str | None, int, int]:
-        branches: list[tuple[str, str, str]] = []
-        default : str | None = None
-        is_ret  : bool | None = None
+    def _try_convert(
+        self,
+        source: str,
+        first_match: re.Match,
+        first_has_pvar: bool,
+        chain_var: str,
+    ) -> tuple[str | None, int, int]:
+        branches: list[tuple[str, str, str]] = []  # (type, pvar, expr)
+        default: str | None = None
+        is_ret: bool | None = None
 
-        brace_open   = source.index('{', first_match.end() - 1)
-        body, pos    = _extract_block(source, brace_open)
-        stmt         = _single_stmt(body)
+        brace_open = source.index('{', first_match.end() - 1)
+        body, pos  = _extract_block(source, brace_open)
+        stmt       = _single_stmt(body)
         if stmt is None:
             return None, 0, 0
-        ret, expr    = _is_return(stmt)
-        is_ret       = ret
-        branches.append((first_match.group('type'), first_match.group('pvar'), expr))
+
+        type_name = first_match.group('type')
+        if first_has_pvar:
+            pvar = first_match.group('pvar')
+        else:
+            # Auto-generate pvar; substitute casts in stmt
+            pvar = _make_pvar(type_name)
+            stmt = _substitute_cast(stmt, type_name, pvar)
+
+        ret, expr = _is_return(stmt)
+        is_ret = ret
+        branches.append((type_name, pvar, expr))
 
         while True:
-            m2 = _ELSEIF_INST_RE.match(source, pos - 1)
+            m2, has_pvar2 = _match_elseif_inst(source, pos - 1)
             if m2 and m2.group('var') == chain_var:
                 brace_open  = source.index('{', m2.end() - 1)
                 body, pos   = _extract_block(source, brace_open)
-                stmt        = _single_stmt(body)
-                if stmt is None:
+                stmt2       = _single_stmt(body)
+                if stmt2 is None:
                     return None, 0, 0
-                ret2, expr2 = _is_return(stmt)
+
+                type2 = m2.group('type')
+                if has_pvar2:
+                    pvar2 = m2.group('pvar')
+                else:
+                    pvar2 = _make_pvar(type2)
+                    stmt2 = _substitute_cast(stmt2, type2, pvar2)
+
+                ret2, expr2 = _is_return(stmt2)
                 if ret2 != is_ret:
                     return None, 0, 0
-                branches.append((m2.group('type'), m2.group('pvar'), expr2))
+                branches.append((type2, pvar2, expr2))
                 continue
 
             m3 = _ELSE_RE.match(source, pos - 1)
             if m3:
                 brace_open  = source.index('{', m3.end() - 1)
                 body, pos   = _extract_block(source, brace_open)
-                stmt        = _single_stmt(body)
-                if stmt is None:
+                stmt3       = _single_stmt(body)
+                if stmt3 is None:
                     return None, 0, 0
-                ret3, expr3 = _is_return(stmt)
+                ret3, expr3 = _is_return(stmt3)
                 if ret3 != is_ret:
                     return None, 0, 0
                 default = expr3
@@ -191,3 +261,21 @@ class InstanceofSwitchTransformer(BaseTransformer):
         lines.append(f'{indent}}};')
 
         return '\n'.join(lines), pos, len(branches)
+
+
+def _substitute_cast(stmt: str, type_name: str, pvar: str) -> str:
+    """
+    In a statement that uses (TypeName)obj casts, replace the cast expression
+    with the pattern variable so the switch arm reads naturally.
+
+    Example:
+      stmt      = "System.out.println((Integer)obj)"
+      type_name = "Integer"
+      pvar      = "integer"
+      result    = "System.out.println(integer)"
+    """
+    # Replace (TypeName) castTarget with pvar
+    cast_pattern = re.compile(
+        r'\(\s*' + re.escape(type_name) + r'\s*\)\s*(\w+)'
+    )
+    return cast_pattern.sub(pvar, stmt)

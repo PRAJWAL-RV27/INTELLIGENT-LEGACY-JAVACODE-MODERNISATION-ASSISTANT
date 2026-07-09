@@ -1,44 +1,51 @@
 import re
+from .base_transformer import BaseTransformer
 
-class RemoveNotifyComponentPeerTransformer:
+
+class RemoveNotifyComponentPeerTransformer(BaseTransformer):
     def transform(self, content: str):
         changes = []
 
-        # ---------- FIND ALL CLASSES ----------
         class_pattern = r'class\s+\w+[^{]*\{'
-        class_matches = list(re.finditer(class_pattern, content))
+        method_header = r'\b(public|protected)\s+void\s+removeNotify\s*\(\s*ComponentPeer\s+\w+\s*\)\s*\{'
 
-        # ---------- HANDLE METHOD OVERRIDES ----------
-        method_pattern = r'\b(public|protected)\s+void\s+removeNotify\s*\(\s*ComponentPeer\s+\w+\s*\)\s*\{([\s\S]*?)\}'
-        method_matches = list(re.finditer(method_pattern, content))
+        while True:
+            method_match = re.search(method_header, content)
+            if not method_match:
+                break
 
-        for match in reversed(method_matches):
-            original_body = match.group(2)
+            # Balanced-brace extraction
+            brace_start = content.index('{', method_match.start())
+            depth, i = 0, brace_start
+            while i < len(content):
+                if content[i] == '{':
+                    depth += 1
+                elif content[i] == '}':
+                    depth -= 1
+                    if depth == 0:
+                        break
+                i += 1
+            method_end = i + 1
+            original_body = content[brace_start + 1:i]
 
-            # Remove super call safely
+            # Remove super call from body
             cleaned_body = re.sub(
                 r'super\.removeNotify\s*\(\s*\)\s*;', '', original_body
             ).strip()
 
             # Remove original method
-            content = content[:match.start()] + content[match.end():]
+            content = content[:method_match.start()] + content[method_end:]
 
-            # ---------- CASE 1: EMPTY ----------
             if cleaned_body == "":
                 changes.append("Removed empty removeNotify(ComponentPeer)")
                 continue
 
-            # ---------- FIND CLASS TO INSERT ----------
-            insert_pos = None
-            for cls in reversed(class_matches):
-                if cls.start() < match.start():
-                    insert_pos = cls.end()
-                    break
-
-            if insert_pos is None:
+            # Re-locate class insert position after mutation
+            class_match = re.search(class_pattern, content)
+            if not class_match:
                 continue
+            insert_pos = class_match.end()
 
-            # ---------- CREATE CLEANUP METHOD ----------
             new_method = f"""
 
     // Auto-migrated from removeNotify(ComponentPeer)
@@ -48,22 +55,17 @@ class RemoveNotifyComponentPeerTransformer:
         {cleaned_body}
     }}
 """
-
             content = content[:insert_pos] + new_method + content[insert_pos:]
             changes.append("Converted removeNotify(ComponentPeer) to cleanupResources()")
 
-        # ---------- HANDLE DIRECT CALLS (FIXED) ----------
-        call_pattern = r'\b(\w+)\.removeNotify\s*\(\s*[^)]*\)\s*;'
-        call_matches = list(re.finditer(call_pattern, content))
-
-        for match in reversed(call_matches):
-            full_match = match.group(0)
-
-            replacement = """
-        // Removed deprecated removeNotify(ComponentPeer) call
-        // Use cleanupResources() if required
-        """
-
+        # ---------- HANDLE DIRECT CALLS ----------
+        # Matches: obj.removeNotify(anyArgs);
+        call_pattern = r'\b(\w+)\.removeNotify\s*\([^)]*\)\s*;'
+        for match in reversed(list(re.finditer(call_pattern, content))):
+            replacement = (
+                "\n        // Removed deprecated removeNotify(ComponentPeer) call"
+                "\n        // Use cleanupResources() if required\n        "
+            )
             content = content[:match.start()] + replacement + content[match.end():]
             changes.append("Removed removeNotify(ComponentPeer) call")
 

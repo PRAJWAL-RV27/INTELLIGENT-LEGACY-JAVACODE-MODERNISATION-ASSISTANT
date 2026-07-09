@@ -1,23 +1,34 @@
 import re
+from .base_transformer import BaseTransformer
 
-class DragSourceContextPeerTransformer:
+
+class DragSourceContextPeerTransformer(BaseTransformer):
+    """
+    Handles  createDragSourceContext(...)  in the EXPRESSION/ASSIGNMENT form
+    (i.e. the result is used in an assignment or returned).
+
+    The statement form (standalone call ending in ';') is handled by
+    DragSourceContextTransformer, so we only match when there is NO
+    trailing ';' immediately after the closing parenthesis.
+    """
+
     def transform(self, content: str):
         changes = []
 
-        # Pattern for createDragSourceContext(...)
-        pattern = r'(\b\w+\b)\.createDragSourceContext\s*\(([\s\S]*?)\)'
+        # Match expression form: does NOT end with ';' on the same token
+        # We require the match to NOT be followed by optional-whitespace + ';'
+        pattern = re.compile(
+            r'(\b\w+\b)\.createDragSourceContext\s*\(([^)]*)\)(?!\s*;)'
+        )
 
-        matches = list(re.finditer(pattern, content))
+        matches = list(pattern.finditer(content))
 
         for match in reversed(matches):
             obj = match.group(1)
-            full_call = match.group(0)
-
-            # Check if assigned (logic depends on result)
             before = content[:match.start()]
+            # Check if the expression is on the right-hand side of an assignment
             is_assigned = re.search(r'=\s*$', before.strip().split('\n')[-1])
 
-            # ✅ CASE 1: NOT ASSIGNED → Safe replace with startDrag()
             if not is_assigned:
                 replacement = f"""
         // Auto-replaced removed API: createDragSourceContext(...)
@@ -34,20 +45,15 @@ class DragSourceContextPeerTransformer:
             }}
         )
         """
-
                 changes.append("Replaced createDragSourceContext() with startDrag()")
-
-            # ⚠️ CASE 2: ASSIGNED → Needs fallback
             else:
-                replacement = f"""
+                replacement = """
         // WARNING: Removed API createDragSourceContext() used in assignment
         // Returning null to preserve compilation — manual fix required
         null
         """
-
                 changes.append("Replaced createDragSourceContext() with null (assignment case)")
 
-            # Replace safely
             content = content[:match.start()] + replacement + content[match.end():]
 
         return content, changes

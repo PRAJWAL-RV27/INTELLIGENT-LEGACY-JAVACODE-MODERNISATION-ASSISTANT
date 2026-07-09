@@ -1,6 +1,7 @@
 import re
+from .base_transformer import BaseTransformer
 
-class AddNotifyComponentPeerTransformer:
+class AddNotifyComponentPeerTransformer(BaseTransformer):
     def transform(self, content: str):
         changes = []
 
