@@ -1,2 +1,20 @@
+<<<<<<< HEAD
 __pycache__/
 *.pyc
+=======
+# Ignore Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+
+# Virtual envs
+venv/
+ENV/
+.env
+
+# Build/dist
+build/
+dist/
+*.egg-info/
+>>>>>>> origin/prajwal
