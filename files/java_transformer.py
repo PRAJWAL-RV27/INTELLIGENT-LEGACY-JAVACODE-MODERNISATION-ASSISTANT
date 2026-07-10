@@ -52,6 +52,11 @@ from transformers.org_omg_jmx_rmi_stub_transform import OMGJMXRMIStubTransformer
 from transformers.sending_context_transform import SendingContextTransformer
 from transformers.portable_server_transform import PortableServerTransformer
 from transformers.portable_server_portable_transform import PortableServerPortableTransformer
+from transformers.codec_factory_package_transform import CodecFactoryPackageTransformer
+from transformers.codec_package_transform import CodecPackageTransformer
+from transformers.iop_transform import IOPTransformer
+from transformers.messaging_transform import MessagingTransformer
+from transformers.orb_init_info_package_transform import ORBInitInfoPackageTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
 from transformers.colormodel_finalize_transformer import ColorModelFinalizeTransformer
@@ -74,6 +79,11 @@ class JavaTransformer:
             SendingContextTransformer(),
             PortableServerTransformer(),
             PortableServerPortableTransformer(),
+            CodecFactoryPackageTransformer(),
+            CodecPackageTransformer(),
+            IOPTransformer(),
+            MessagingTransformer(),
+            ORBInitInfoPackageTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
