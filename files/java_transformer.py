@@ -57,6 +57,7 @@ from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransfo
 from transformers.colormodel_finalize_transformer import ColorModelFinalizeTransformer
 from transformers.Indexcolormodel_finalize_transformer import IndexColorModelFinalizeTransformer
 from transformers.component_getPeer_transform import ComponentGetPeerTransformer
+from transformers.menucomponent_getpeer_transform import MenuComponentGetPeerTransformer
 
 
 class JavaTransformer:
@@ -84,6 +85,7 @@ class JavaTransformer:
             RemoveNotifyTransformer(),
             AddNotifyComponentPeerTransformer(), 
             RemoveNotifyComponentPeerTransformer(),
+            MenuComponentGetPeerTransformer(),
             ComponentGetPeerTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
