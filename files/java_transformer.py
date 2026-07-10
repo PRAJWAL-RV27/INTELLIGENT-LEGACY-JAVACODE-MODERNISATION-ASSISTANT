@@ -52,6 +52,16 @@ from transformers.org_omg_jmx_rmi_stub_transform import OMGJMXRMIStubTransformer
 from transformers.sending_context_transform import SendingContextTransformer
 from transformers.portable_server_transform import PortableServerTransformer
 from transformers.portable_server_portable_transform import PortableServerPortableTransformer
+from transformers.current_package_transform import CurrentPackageTransformer
+from transformers.poa_manager_package_transform import POAManagerPackageTransformer
+from transformers.poa_package_transform import POAPackageTransformer
+from transformers.portable_interceptor_transform import PortableInterceptorTransformer
+from transformers.servant_locator_package_transform import ServantLocatorPackageTransformer
+from transformers.cos_naming_transform import CosNamingTransformer
+from transformers.dyn_any_factory_package_transform import DynAnyFactoryPackageTransformer
+from transformers.dyn_any_package_transform import DynAnyPackageTransformer
+from transformers.dynamic_any_transform import DynamicAnyTransformer
+from transformers.dynamic_transform import DynamicTransformer
 from transformers.codec_factory_package_transform import CodecFactoryPackageTransformer
 from transformers.codec_package_transform import CodecPackageTransformer
 from transformers.iop_transform import IOPTransformer
@@ -78,11 +88,21 @@ class JavaTransformer:
             SendingContextTransformer(),
             PortableServerTransformer(),
             PortableServerPortableTransformer(),
+            CurrentPackageTransformer(),
+            POAManagerPackageTransformer(),
+            POAPackageTransformer(),
+            PortableInterceptorTransformer(),
+            ServantLocatorPackageTransformer(),
             CodecFactoryPackageTransformer(),
             CodecPackageTransformer(),
             IOPTransformer(),
             MessagingTransformer(),
             ORBInitInfoPackageTransformer(),
+            CosNamingTransformer(),
+            DynAnyFactoryPackageTransformer(),
+            DynAnyPackageTransformer(),
+            DynamicAnyTransformer(),
+            DynamicTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
