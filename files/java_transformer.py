@@ -56,6 +56,7 @@ from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
 from transformers.colormodel_finalize_transformer import ColorModelFinalizeTransformer
 from transformers.Indexcolormodel_finalize_transformer import IndexColorModelFinalizeTransformer
+from transformers.component_getPeer_transform import ComponentGetPeerTransformer
 
 
 class JavaTransformer:
@@ -83,6 +84,7 @@ class JavaTransformer:
             RemoveNotifyTransformer(),
             AddNotifyComponentPeerTransformer(), 
             RemoveNotifyComponentPeerTransformer(),
+            ComponentGetPeerTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
             TextLayoutEqualsTransformer(),
