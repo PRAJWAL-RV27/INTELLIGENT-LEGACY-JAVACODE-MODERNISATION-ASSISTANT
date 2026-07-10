@@ -54,8 +54,9 @@ from transformers.portable_server_transform import PortableServerTransformer
 from transformers.portable_server_portable_transform import PortableServerPortableTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
-from transformers.colormodel_finalize_transform import ColorModelFinalizeTransformer
-from transformers.colormodel_finalize_transform import ColorModelFinalizeTransformer
+from transformers.colormodel_finalize_transformer import ColorModelFinalizeTransformer
+from transformers.Indexcolormodel_finalize_transformer import IndexColorModelFinalizeTransformer
+
 
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
@@ -74,6 +75,7 @@ class JavaTransformer:
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
+            IndexColorModelFinalizeTransformer(),
             FinalizeTransformer(),
             DragSourceContextTransformer(),
             DragSourceContextPeerTransformer(),
