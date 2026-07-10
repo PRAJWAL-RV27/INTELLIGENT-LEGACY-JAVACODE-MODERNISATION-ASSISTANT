@@ -59,8 +59,10 @@ from transformers.messaging_transform import MessagingTransformer
 from transformers.orb_init_info_package_transform import ORBInitInfoPackageTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
-from transformers.colormodel_finalize_transform import ColorModelFinalizeTransformer
-from transformers.colormodel_finalize_transform import ColorModelFinalizeTransformer
+from transformers.colormodel_finalize_transformer import ColorModelFinalizeTransformer
+from transformers.Indexcolormodel_finalize_transformer import IndexColorModelFinalizeTransformer
+from transformers.component_getPeer_transform import ComponentGetPeerTransformer
+
 
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
@@ -84,6 +86,7 @@ class JavaTransformer:
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
+            IndexColorModelFinalizeTransformer(),
             FinalizeTransformer(),
             DragSourceContextTransformer(),
             DragSourceContextPeerTransformer(),
@@ -91,6 +94,7 @@ class JavaTransformer:
             RemoveNotifyTransformer(),
             AddNotifyComponentPeerTransformer(), 
             RemoveNotifyComponentPeerTransformer(),
+            ComponentGetPeerTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
             TextLayoutEqualsTransformer(),
