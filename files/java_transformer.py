@@ -52,9 +52,24 @@ from transformers.org_omg_jmx_rmi_stub_transform import OMGJMXRMIStubTransformer
 from transformers.sending_context_transform import SendingContextTransformer
 from transformers.portable_server_transform import PortableServerTransformer
 from transformers.portable_server_portable_transform import PortableServerPortableTransformer
+from transformers.current_package_transform import CurrentPackageTransformer
+from transformers.poa_manager_package_transform import POAManagerPackageTransformer
+from transformers.poa_package_transform import POAPackageTransformer
+from transformers.portable_interceptor_transform import PortableInterceptorTransformer
+from transformers.servant_locator_package_transform import ServantLocatorPackageTransformer
+from transformers.cos_naming_transform import CosNamingTransformer
+from transformers.dyn_any_factory_package_transform import DynAnyFactoryPackageTransformer
+from transformers.dyn_any_package_transform import DynAnyPackageTransformer
+from transformers.dynamic_any_transform import DynamicAnyTransformer
+from transformers.dynamic_transform import DynamicTransformer
 from transformers.codec_factory_package_transform import CodecFactoryPackageTransformer
 from transformers.codec_package_transform import CodecPackageTransformer
 from transformers.iop_transform import IOPTransformer
+from transformers.corba_transform import CORBATransformer
+from transformers.corba_2_3_portable_transform import CORBA23PortableTransformer
+from transformers.corba_2_3_transform import CORBA23Transformer
+from transformers.naming_context_ext_package_transform import NamingContextExtPackageTransformer
+from transformers.naming_context_package_transform import NamingContextPackageTransformer
 from transformers.messaging_transform import MessagingTransformer
 from transformers.orb_init_info_package_transform import ORBInitInfoPackageTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
@@ -63,7 +78,7 @@ from transformers.colormodel_finalize_transformer import ColorModelFinalizeTrans
 from transformers.Indexcolormodel_finalize_transformer import IndexColorModelFinalizeTransformer
 from transformers.component_getPeer_transform import ComponentGetPeerTransformer
 from transformers.menucomponent_getpeer_transform import MenuComponentGetPeerTransformer
-from transformers.toolkit_createbutton_transform import ToolkitCreateButtonTransformer
+from transformers.toolkit_createbutton_transform import ToolkitCreateButtonTransformerfrom transformers.get_mouse_info_peer_transform import GetMouseInfoPeerTransformer
 
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
@@ -79,11 +94,26 @@ class JavaTransformer:
             SendingContextTransformer(),
             PortableServerTransformer(),
             PortableServerPortableTransformer(),
+            CurrentPackageTransformer(),
+            POAManagerPackageTransformer(),
+            POAPackageTransformer(),
+            PortableInterceptorTransformer(),
+            ServantLocatorPackageTransformer(),
             CodecFactoryPackageTransformer(),
             CodecPackageTransformer(),
             IOPTransformer(),
             MessagingTransformer(),
             ORBInitInfoPackageTransformer(),
+            CosNamingTransformer(),
+            DynAnyFactoryPackageTransformer(),
+            DynAnyPackageTransformer(),
+            DynamicAnyTransformer(),
+            DynamicTransformer(),
+            CORBATransformer(),
+            CORBA23PortableTransformer(),
+            CORBA23Transformer(),
+            NamingContextExtPackageTransformer(),
+            NamingContextPackageTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
@@ -97,6 +127,7 @@ class JavaTransformer:
             RemoveNotifyComponentPeerTransformer(),
             MenuComponentGetPeerTransformer(),
             ComponentGetPeerTransformer(),
+            GetMouseInfoPeerTransformer(),
             ToolkitCreateButtonTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
