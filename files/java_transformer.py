@@ -70,6 +70,10 @@ from transformers.corba_2_3_portable_transform import CORBA23PortableTransformer
 from transformers.corba_2_3_transform import CORBA23Transformer
 from transformers.naming_context_ext_package_transform import NamingContextExtPackageTransformer
 from transformers.naming_context_package_transform import NamingContextPackageTransformer
+from transformers.corba_dyn_any_package_transform import CORBADynAnyPackageTransformer
+from transformers.corba_orb_package_transform import CORBAORBPackageTransformer
+from transformers.corba_type_code_package_transform import CORBATypeCodePackageTransformer
+from transformers.corba_portable_transform import CORBAPortableTransformer
 from transformers.messaging_transform import MessagingTransformer
 from transformers.orb_init_info_package_transform import ORBInitInfoPackageTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
@@ -114,6 +118,10 @@ class JavaTransformer:
             CORBA23Transformer(),
             NamingContextExtPackageTransformer(),
             NamingContextPackageTransformer(),
+            CORBADynAnyPackageTransformer(),
+            CORBAORBPackageTransformer(),
+            CORBATypeCodePackageTransformer(),
+            CORBAPortableTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
