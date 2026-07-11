@@ -65,6 +65,11 @@ from transformers.dynamic_transform import DynamicTransformer
 from transformers.codec_factory_package_transform import CodecFactoryPackageTransformer
 from transformers.codec_package_transform import CodecPackageTransformer
 from transformers.iop_transform import IOPTransformer
+from transformers.corba_transform import CORBATransformer
+from transformers.corba_2_3_portable_transform import CORBA23PortableTransformer
+from transformers.corba_2_3_transform import CORBA23Transformer
+from transformers.naming_context_ext_package_transform import NamingContextExtPackageTransformer
+from transformers.naming_context_package_transform import NamingContextPackageTransformer
 from transformers.messaging_transform import MessagingTransformer
 from transformers.orb_init_info_package_transform import ORBInitInfoPackageTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
@@ -104,6 +109,11 @@ class JavaTransformer:
             DynAnyPackageTransformer(),
             DynamicAnyTransformer(),
             DynamicTransformer(),
+            CORBATransformer(),
+            CORBA23PortableTransformer(),
+            CORBA23Transformer(),
+            NamingContextExtPackageTransformer(),
+            NamingContextPackageTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
