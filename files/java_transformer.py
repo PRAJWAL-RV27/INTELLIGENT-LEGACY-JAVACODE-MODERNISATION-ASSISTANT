@@ -63,7 +63,7 @@ from transformers.colormodel_finalize_transformer import ColorModelFinalizeTrans
 from transformers.Indexcolormodel_finalize_transformer import IndexColorModelFinalizeTransformer
 from transformers.component_getPeer_transform import ComponentGetPeerTransformer
 from transformers.menucomponent_getpeer_transform import MenuComponentGetPeerTransformer
-
+from transformers.toolkit_createbutton_transform import ToolkitCreateButtonTransformer
 
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
@@ -97,6 +97,7 @@ class JavaTransformer:
             RemoveNotifyComponentPeerTransformer(),
             MenuComponentGetPeerTransformer(),
             ComponentGetPeerTransformer(),
+            ToolkitCreateButtonTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
             TextLayoutEqualsTransformer(),
