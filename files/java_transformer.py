@@ -84,6 +84,10 @@ from transformers.component_getPeer_transform import ComponentGetPeerTransformer
 from transformers.menucomponent_getpeer_transform import MenuComponentGetPeerTransformer
 from transformers.toolkit_createbutton_transform import ToolkitCreateButtonTransformer
 from transformers.get_mouse_info_peer_transform import GetMouseInfoPeerTransformer
+from transformers.toolkit_createcanvas_transform import ToolkitCreateCanvasTransformer
+from transformers.toolkit_createcheckbox_transform import ToolkitCreateCheckboxTransformer
+from transformers.toolkit_createcheckboxmenuitem_transform import ToolkitCreateCheckboxMenuItemTransformer
+from transformers.toolkit_createchoice_transform import ToolkitCreateChoiceTransformer
 
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
@@ -138,6 +142,10 @@ class JavaTransformer:
             ComponentGetPeerTransformer(),
             GetMouseInfoPeerTransformer(),
             ToolkitCreateButtonTransformer(),
+            ToolkitCreateCanvasTransformer(),
+            ToolkitCreateCheckboxTransformer(),
+            ToolkitCreateCheckboxMenuItemTransformer(),
+            ToolkitCreateChoiceTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
             TextLayoutEqualsTransformer(),
