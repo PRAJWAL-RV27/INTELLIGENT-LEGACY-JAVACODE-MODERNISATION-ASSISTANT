@@ -82,6 +82,7 @@ from transformers.colormodel_finalize_transformer import ColorModelFinalizeTrans
 from transformers.Indexcolormodel_finalize_transformer import IndexColorModelFinalizeTransformer
 from transformers.component_getPeer_transform import ComponentGetPeerTransformer
 from transformers.menucomponent_getpeer_transform import MenuComponentGetPeerTransformer
+from transformers.toolkit_createbutton_transform import ToolkitCreateButtonTransformer
 from transformers.get_mouse_info_peer_transform import GetMouseInfoPeerTransformer
 
 class JavaTransformer:
@@ -136,6 +137,7 @@ class JavaTransformer:
             MenuComponentGetPeerTransformer(),
             ComponentGetPeerTransformer(),
             GetMouseInfoPeerTransformer(),
+            ToolkitCreateButtonTransformer(),
             JAXBHelpersRemovalTransformer(),
             JAXBUtilRemovalTransformer(),
             TextLayoutEqualsTransformer(),
