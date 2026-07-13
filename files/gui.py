@@ -378,6 +378,12 @@ class TransformerGUI:
             self.summary_final = None
             self.status_label.configure(text="❌ Transformation failed or no files processed.", text_color="#ef4444")
 
+    def _default_download_dir(self) -> Path:
+        downloads_dir = Path.home() / "Downloads"
+        if downloads_dir.exists():
+            return downloads_dir
+        return Path.home()
+
     def save_zip(self):
         if not self.dest_dir_final:
             return
@@ -405,6 +411,8 @@ class TransformerGUI:
             return
 
         zip_path = filedialog.asksaveasfilename(
+            initialdir=str(self._default_download_dir()),
+            initialfile=f"{self.dest_dir_final.name}.zip",
             defaultextension=".zip",
             filetypes=[("ZIP files", "*.zip")],
             title="Save Transformed Folder As",
@@ -426,7 +434,13 @@ class TransformerGUI:
     def save_report(self):
         if not self.summary_final:
             return
-        report_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")], title="Save Report As")
+        report_path = filedialog.asksaveasfilename(
+            initialdir=str(self._default_download_dir()),
+            initialfile="transformation_report.txt",
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt")],
+            title="Save Report As",
+        )
         if report_path:
             try:
                 with open(report_path, 'w', encoding='utf-8') as f:
