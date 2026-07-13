@@ -79,8 +79,6 @@ TRANSFORMER_SPECS = [
     ("orb_init_info_package_transform", "ORBInitInfoPackageTransformer"),
     ("textlayout_equals_transform", "TextLayoutEqualsTransformer"),
     ("textlayout_hashcode_transform", "TextLayoutHashCodeTransformer"),
-    ("colormodel_finalize_transformer", "ColorModelFinalizeTransformer"),
-    ("Indexcolormodel_finalize_transformer", "IndexColorModelFinalizeTransformer"),
     ("component_getPeer_transform", "ComponentGetPeerTransformer"),
     ("menucomponent_getpeer_transform", "MenuComponentGetPeerTransformer"),
     ("get_mouse_info_peer_transform", "GetMouseInfoPeerTransformer"),
