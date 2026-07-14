@@ -76,6 +76,11 @@ from transformers.corba_type_code_package_transform import CORBATypeCodePackageT
 from transformers.corba_portable_transform import CORBAPortableTransformer
 from transformers.messaging_transform import MessagingTransformer
 from transformers.orb_init_info_package_transform import ORBInitInfoPackageTransformer
+from transformers.jaxws_transform import JAXWSTransformer
+from transformers.jaxws_soap_transform import JAXWSSOAPTransformer
+from transformers.jaxws_spi_transform import JAXWSSPITransformer
+from transformers.jaxws_spi_http_transform import JAXWSSPIHTTPTransformer
+from transformers.jaxws_wsaddressing_transform import JAXWSWSAddressingTransformer
 from transformers.textlayout_equals_transform import TextLayoutEqualsTransformer
 from transformers.textlayout_hashcode_transform import TextLayoutHashCodeTransformer
 from transformers.colormodel_finalize_transformer import ColorModelFinalizeTransformer
@@ -89,7 +94,6 @@ class JavaTransformer:
         self.verbose   = verbose
         self._pipeline = [
             # Phase 1
-            ImportCleanerTransformer(),
             JAXBBindTransformer(),
             SOAPTransformer(),
             JAXWSSOAPHandlerTransformer(),
@@ -122,6 +126,12 @@ class JavaTransformer:
             CORBAORBPackageTransformer(),
             CORBATypeCodePackageTransformer(),
             CORBAPortableTransformer(),
+            JAXWSTransformer(),
+            JAXWSSOAPTransformer(),
+            JAXWSSPITransformer(),
+            JAXWSSPIHTTPTransformer(),
+            JAXWSWSAddressingTransformer(),
+            ImportCleanerTransformer(),
             WrapperConstructorTransformer(),
             DeprecatedMethodsTransformer(),
             ColorModelFinalizeTransformer(),
