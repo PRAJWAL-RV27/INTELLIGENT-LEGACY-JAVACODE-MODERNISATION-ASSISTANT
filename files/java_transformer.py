@@ -38,7 +38,6 @@ from transformers.finalize_transform     import FinalizeTransformer
 from transformers.drag_source_transform  import DragSourceContextTransformer
 from transformers.drag_source_context_peer_transform import DragSourceContextPeerTransformer
 from transformers.add_notify_transform   import AddNotifyTransformer
-from transformers.add_notify_transform   import AddNotifyTransformer
 from transformers.remove_notify_transform import RemoveNotifyTransformer
 from transformers.add_notify_component_peer_transform import AddNotifyComponentPeerTransformer
 from transformers.remove_notify_component_peer_transform import RemoveNotifyComponentPeerTransformer
