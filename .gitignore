@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-__pycache__/
-*.pyc
-=======
 # Ignore Python bytecode and caches
 __pycache__/
 *.py[cod]
@@ -17,4 +13,3 @@ ENV/
 build/
 dist/
 *.egg-info/
->>>>>>> origin/prajwal
