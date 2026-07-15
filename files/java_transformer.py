@@ -57,6 +57,11 @@ TRANSFORMER_SPECS = [
     ("jaxb_bind_transform", "JAXBBindTransformer"),
     ("soap_transform", "SOAPTransformer"),
     ("jaxws_soap_handler_transform", "JAXWSSOAPHandlerTransformer"),
+    ("jaxws_soap_transform","JAXWSSOAPTransformer")
+    ("jaxws_spi_http_transform","JAXWSSPIHTTPTransformer")
+    ("jaxws_spi_transform","JAXWSSPITransformer")
+    ("jaxws_transform","JAXWSTransformer")
+    ("jaxws_wsaddressing_transform","JAXWSWSAddressingTransformer")
     ("org_omg_rmi_stub_transform", "OMGRMIStubTransformer"),
     ("org_omg_jmx_rmi_stub_transform", "OMGJMXRMIStubTransformer"),
     ("sending_context_transform", "SendingContextTransformer"),
