@@ -58,7 +58,14 @@ TRANSFORMER_SPECS = [
     ("jaxb_util_removal", "JAXBUtilRemovalTransformer"),
     ("jaxb_bind_transform", "JAXBBindTransformer"),
     ("soap_transform", "SOAPTransformer"),
+    ("jaxws_handler_transform","JAXWSHandlerTransformer"),
+    ("jaxws_http_transform","JAXWSHTTPTransformer"),
     ("jaxws_soap_handler_transform", "JAXWSSOAPHandlerTransformer"),
+    ("jaxws_soap_transform","JAXWSSOAPTransformer"),
+    ("jaxws_spi_http_transform","JAXWSSPIHTTPTransformer"),
+    ("jaxws_spi_transform","JAXWSSPITransformer"),
+    ("jaxws_transform","JAXWSTransformer"),
+    ("jaxws_wsaddressing_transform","JAXWSWSAddressingTransformer"),
     ("org_omg_rmi_stub_transform", "OMGRMIStubTransformer"),
     ("org_omg_jmx_rmi_stub_transform", "OMGJMXRMIStubTransformer"),
     ("sending_context_transform", "SendingContextTransformer"),
@@ -70,6 +77,15 @@ TRANSFORMER_SPECS = [
     ("portable_interceptor_transform", "PortableInterceptorTransformer"),
     ("servant_locator_package_transform", "ServantLocatorPackageTransformer"),
     ("cos_naming_transform", "CosNamingTransformer"),
+    ("corba_transform", "CORBATransformer"),
+    ("corba_2_3_portable_transform", "CORBA23PortableTransformer"),
+    ("corba_2_3_transform", "CORBA23Transformer"),
+    ("naming_context_ext_package_transform", "NamingContextExtPackageTransformer"),
+    ("naming_context_package_transform", "NamingContextPackageTransformer"),
+    ("corba_dyn_any_package_transform", "CORBADynAnyPackageTransformer"),
+    ("corba_orb_package_transform", "CORBAORBPackageTransformer"),
+    ("corba_type_code_package_transform", "CORBATypeCodePackageTransformer"),
+    ("corba_portable_transform", "CORBAPortableTransformer"),
     ("dyn_any_factory_package_transform", "DynAnyFactoryPackageTransformer"),
     ("dyn_any_package_transform", "DynAnyPackageTransformer"),
     ("dynamic_any_transform", "DynamicAnyTransformer"),
@@ -85,6 +101,7 @@ TRANSFORMER_SPECS = [
     ("menucomponent_getpeer_transform", "MenuComponentGetPeerTransformer"),
     ("get_mouse_info_peer_transform", "GetMouseInfoPeerTransformer"),
 ]
+
 
 class JavaTransformer:
     def __init__(self, verbose: bool = False) -> None:
