@@ -36,6 +36,8 @@ TRANSFORMER_SPECS = [
     ("import_cleaner", "ImportCleanerTransformer"),
     ("wrapper_constructors", "WrapperConstructorTransformer"),
     ("deprecated_methods", "DeprecatedMethodsTransformer"),
+    ("zip_finalizer_end", "ZipFinalizerEndTransformer"),
+    ("zipfile_finalize_transform", "ZipFileFinalizeTransformer"),
     ("diamond_operator", "DiamondOperatorTransformer"),
     ("instanceof_pattern", "InstanceofPatternTransformer"),
     ("string_improvements", "StringImprovementsTransformer"),
