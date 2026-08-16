@@ -72,6 +72,21 @@ class Thing {
     assert not changes
 
 
+def test_unrelated_empty_finalize_method_unchanged():
+    content = '''
+class SomeOtherClass {
+    public void finalize() throws Throwable {
+    }
+}
+'''
+
+    transformed, changes = JavaTransformer().transform(content)
+
+    assert "public void finalize() throws Throwable" in transformed
+    assert "Removed empty finalize() method" not in str(changes)
+    assert not changes
+
+
 def test_multiple_occurrences_in_same_file():
     content = '''
 import java.util.zip.Deflater;
