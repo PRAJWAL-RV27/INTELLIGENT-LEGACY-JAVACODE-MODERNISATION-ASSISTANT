@@ -33,6 +33,10 @@ def _load_transformer(module_name: str, class_name: str):
 
 
 TRANSFORMER_SPECS = [
+    ("javax_activation_transform", "JavaxActivationToJakartaTransformer"),
+    ("javax_activity_transform", "JavaxActivityManualReviewTransformer"),
+    ("javax_annotation_transform", "JavaxAnnotationToJakartaTransformer"),
+    ("icc_profile_finalize_transform", "ICCProfileFinalizeManualReviewTransformer"),
     ("import_cleaner", "ImportCleanerTransformer"),
     ("wrapper_constructors", "WrapperConstructorTransformer"),
     ("deprecated_methods", "DeprecatedMethodsTransformer"),
