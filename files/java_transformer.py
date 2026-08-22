@@ -104,6 +104,9 @@ TRANSFORMER_SPECS = [
     ("component_getPeer_transform", "ComponentGetPeerTransformer"),
     ("menucomponent_getpeer_transform", "MenuComponentGetPeerTransformer"),
     ("get_mouse_info_peer_transform", "GetMouseInfoPeerTransformer"),
+    ("toolkit_createbutton_transform", "ToolkitCreateButtonTransformer"),
+    ("toolkit_createcanvas_transform", "ToolkitCreateCanvasTransformer"),
+    ("toolkit_createcheckbox_transform", "ToolkitCreateCheckboxTransformer"),
 ]
 
 
