@@ -107,6 +107,9 @@ TRANSFORMER_SPECS = [
     ("toolkit_createbutton_transform", "ToolkitCreateButtonTransformer"),
     ("toolkit_createcanvas_transform", "ToolkitCreateCanvasTransformer"),
     ("toolkit_createcheckbox_transform", "ToolkitCreateCheckboxTransformer"),
+    ("toolkit_createcheckboxmenuitem_transform", "ToolkitCreateCheckboxMenuItemTransformer"),
+    ("toolkit_createchoice_transform", "ToolkitCreateChoiceTransformer"),
+    ("toolkit_createcomponent_transform", "ToolkitCreateComponentTransformer"),
 ]
 
 
