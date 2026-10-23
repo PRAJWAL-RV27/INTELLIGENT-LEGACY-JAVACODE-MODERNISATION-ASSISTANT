@@ -33,9 +33,15 @@ def _load_transformer(module_name: str, class_name: str):
 
 
 TRANSFORMER_SPECS = [
+    ("javax_activation_transform", "JavaxActivationToJakartaTransformer"),
+    ("javax_activity_transform", "JavaxActivityManualReviewTransformer"),
+    ("javax_annotation_transform", "JavaxAnnotationToJakartaTransformer"),
+    ("icc_profile_finalize_transform", "ICCProfileFinalizeManualReviewTransformer"),
     ("import_cleaner", "ImportCleanerTransformer"),
     ("wrapper_constructors", "WrapperConstructorTransformer"),
     ("deprecated_methods", "DeprecatedMethodsTransformer"),
+    ("zip_finalizer_end", "ZipFinalizerEndTransformer"),
+    ("zipfile_finalize_transform", "ZipFileFinalizeTransformer"),
     ("diamond_operator", "DiamondOperatorTransformer"),
     ("instanceof_pattern", "InstanceofPatternTransformer"),
     ("string_improvements", "StringImprovementsTransformer"),
@@ -97,6 +103,12 @@ TRANSFORMER_SPECS = [
     ("component_getPeer_transform", "ComponentGetPeerTransformer"),
     ("menucomponent_getpeer_transform", "MenuComponentGetPeerTransformer"),
     ("get_mouse_info_peer_transform", "GetMouseInfoPeerTransformer"),
+    ("toolkit_createbutton_transform", "ToolkitCreateButtonTransformer"),
+    ("toolkit_createcanvas_transform", "ToolkitCreateCanvasTransformer"),
+    ("toolkit_createcheckbox_transform", "ToolkitCreateCheckboxTransformer"),
+    ("toolkit_createcheckboxmenuitem_transform", "ToolkitCreateCheckboxMenuItemTransformer"),
+    ("toolkit_createchoice_transform", "ToolkitCreateChoiceTransformer"),
+    ("toolkit_createcomponent_transform", "ToolkitCreateComponentTransformer"),
 ]
 
 
