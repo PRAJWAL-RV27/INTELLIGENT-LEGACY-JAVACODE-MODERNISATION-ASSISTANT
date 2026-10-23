@@ -48,7 +48,6 @@ TRANSFORMER_SPECS = [
     ("collections_factory", "CollectionsFactoryTransformer"),
     ("collectors_modern", "CollectorsModernTransformer"),
     ("string_format", "StringFormatTransformer"),
-    ("sequenced_collections", "SequencedCollectionsTransformer"),
     ("instanceof_switch", "InstanceofSwitchTransformer"),
     ("record_pattern", "RecordPatternTransformer"),
     ("finalize_transform", "FinalizeTransformer"),
@@ -125,6 +124,7 @@ class JavaTransformer:
 
     def transform(self, content: str, filename: str = "") -> tuple[str, list[str]]:
         all_changes: list[str] = []
+        original_text = content
         for t in self._pipeline:
             content, changes = t.transform(content)
             if changes and self.verbose:
@@ -132,4 +132,9 @@ class JavaTransformer:
                 for c in changes:
                     print(f"    [{label}] {c}")
             all_changes.extend(changes)
+
+        # Several transformers split/join lines and drop the final newline.
+        # Restore it so unchanged files stay byte-identical.
+        if original_text.endswith("\n") and not content.endswith("\n"):
+            content += "\n"
         return content, all_changes

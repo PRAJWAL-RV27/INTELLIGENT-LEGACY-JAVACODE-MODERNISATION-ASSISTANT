@@ -17,7 +17,10 @@ class AddNotifyTransformer:
         # ---------------------------------------------------------
         # Skip files that don't use addNotify()
         # ---------------------------------------------------------
-        if "addNotify(" not in content:
+        # Only act on the deprecated addNotify(DropTargetContextPeer) form.
+        # A normal override  `public void addNotify() { super.addNotify(); }`
+        # is valid Java 21 and must be left untouched.
+        if not re.search(r'addNotify\s*\(\s*DropTargetContextPeer\b', content):
             return content, changes
 
         # ---------------------------------------------------------
@@ -148,35 +151,6 @@ class AddNotifyTransformer:
 
             changes.append(
                 "Replaced addNotify() with setupDropTarget(Component)"
-            )
-
-        # ---------------------------------------------------------
-        # Replace deprecated calls
-        # ---------------------------------------------------------
-
-        call_pattern = (
-            r'(\b\w+\b)\.addNotify\s*\((.*?)\)\s*;'
-        )
-
-        call_matches = list(re.finditer(call_pattern, content))
-
-        for match in reversed(call_matches):
-
-            replacement = (
-                "\n"
-                "        // TODO(Java21)\n"
-                "        // Deprecated addNotify() call removed.\n"
-                "        // Invoke setupDropTarget(component) if required.\n"
-            )
-
-            content = (
-                content[:match.start()]
-                + replacement
-                + content[match.end():]
-            )
-
-            changes.append(
-                "Removed deprecated addNotify() call"
             )
 
         return content, changes

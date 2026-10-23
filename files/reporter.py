@@ -25,6 +25,14 @@ class Reporter:
         """Store the result for one file."""
         self._reports.append(FileReport(path=path, changes=list(changes)))
 
+    def add_changes(self, path: str, extra: list[str]) -> None:
+        """Append extra change descriptions (e.g. accepted optimizer rewrites)
+        to a file that was already recorded."""
+        for r in self._reports:
+            if r.path == path:
+                r.changes.extend(extra)
+                return
+
     def print_summary(self, dry_run: bool = False) -> None:
         total     = len(self._reports)
         changed   = [r for r in self._reports if r.changed]

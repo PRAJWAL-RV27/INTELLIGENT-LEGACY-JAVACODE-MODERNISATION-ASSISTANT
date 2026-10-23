@@ -1,5 +1,5 @@
 import re
-from .base_transformer import BaseTransformer
+from .base_transformer import BaseTransformer, add_import
 
 
 class JAXBBindTransformer(BaseTransformer):
@@ -102,20 +102,7 @@ class JAXBBindTransformer(BaseTransformer):
         # 4. Add import java.util.Base64 if needed
         # ---------------------------------------------------------
         if base64_needed and "import java.util.Base64;" not in content:
-            import_lines = content.split("\n")
-            inserted = False
-            result_lines: list[str] = []
-
-            for line in import_lines:
-                if not inserted and line.strip().startswith("import "):
-                    result_lines.append("import java.util.Base64;")
-                    inserted = True
-                result_lines.append(line)
-
-            if not inserted:
-                result_lines.insert(0, "import java.util.Base64;")
-
-            content = "\n".join(result_lines)
+            content = add_import(content, "java.util.Base64")
             changes.append("Added import java.util.Base64")
 
         # ---------------------------------------------------------

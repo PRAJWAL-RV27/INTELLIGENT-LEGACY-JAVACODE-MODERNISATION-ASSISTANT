@@ -60,7 +60,7 @@ class RemoveNotifyComponentPeerTransformer(BaseTransformer):
 
         # ---------- HANDLE DIRECT CALLS ----------
         # Matches: obj.removeNotify(anyArgs);
-        call_pattern = r'\b(\w+)\.removeNotify\s*\([^)]*\)\s*;'
+        call_pattern = r'(?<![\w.])(?!super\b|this\b)(\w+)\.removeNotify\s*\(\s*[^)\s][^)]*\)\s*;'  # non-empty arg; never super./this.
         for match in reversed(list(re.finditer(call_pattern, content))):
             replacement = (
                 "\n        // Removed deprecated removeNotify(ComponentPeer) call"
