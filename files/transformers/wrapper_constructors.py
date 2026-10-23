@@ -24,52 +24,35 @@ Safety guarantee
   No change to observable program behaviour.
 """
 import re
-from .base_transformer import BaseTransformer
+from .base_transformer import BaseTransformer, apply_to_code
 from config import DEPRECATED_WRAPPER_TYPES
 
 
 class WrapperConstructorTransformer(BaseTransformer):
 
     def transform(self, content: str) -> tuple[str, list[str]]:
-        changes: list[str] = []
-        result = content
+        # label -> number of replacements (summed over all code segments)
+        counts: dict[str, int] = {}
 
-        # ── Boolean literal: new Boolean(true) → Boolean.TRUE ─────────────────
-        result, n = re.subn(
-            r'\bnew\s+Boolean\s*\(\s*true\s*\)',
-            'Boolean.TRUE',
-            result,
-        )
-        if n:
-            changes.append(f"Replaced {n}× `new Boolean(true)` → `Boolean.TRUE`")
-
-        # ── Boolean literal: new Boolean(false) → Boolean.FALSE ───────────────
-        result, n = re.subn(
-            r'\bnew\s+Boolean\s*\(\s*false\s*\)',
-            'Boolean.FALSE',
-            result,
-        )
-        if n:
-            changes.append(f"Replaced {n}× `new Boolean(false)` → `Boolean.FALSE`")
-
-        # ── Boolean general: new Boolean(expr) → Boolean.valueOf(expr) ────────
-        # Must run AFTER the literal cases above to avoid double-matching.
-        result, n = re.subn(
-            r'\bnew\s+Boolean\s*\(',
-            'Boolean.valueOf(',
-            result,
-        )
-        if n:
-            changes.append(f"Replaced {n}× `new Boolean(...)` → `Boolean.valueOf(...)`")
-
-        # ── Numeric / Character wrapper constructors ───────────────────────────
-        for wtype in DEPRECATED_WRAPPER_TYPES:
-            pattern     = rf'\bnew\s+{re.escape(wtype)}\s*\('
-            replacement = f'{wtype}.valueOf('
-            result, n   = re.subn(pattern, replacement, result)
+        def sub(pattern: str, repl: str, text: str, label: str) -> str:
+            text, n = re.subn(pattern, repl, text)
             if n:
-                changes.append(
-                    f"Replaced {n}× `new {wtype}(...)` → `{wtype}.valueOf(...)`"
-                )
+                counts[label] = counts.get(label, 0) + n
+            return text
 
+        def rewrite(code: str) -> str:
+            code = sub(r'\bnew\s+Boolean\s*\(\s*true\s*\)', 'Boolean.TRUE', code,
+                       "`new Boolean(true)` → `Boolean.TRUE`")
+            code = sub(r'\bnew\s+Boolean\s*\(\s*false\s*\)', 'Boolean.FALSE', code,
+                       "`new Boolean(false)` → `Boolean.FALSE`")
+            code = sub(r'\bnew\s+Boolean\s*\(', 'Boolean.valueOf(', code,
+                       "`new Boolean(...)` → `Boolean.valueOf(...)`")
+            for wtype in DEPRECATED_WRAPPER_TYPES:
+                code = sub(rf'\bnew\s+{re.escape(wtype)}\s*\(', f'{wtype}.valueOf(', code,
+                           f"`new {wtype}(...)` → `{wtype}.valueOf(...)`")
+            return code
+
+        # Only real code is rewritten; strings and comments are left alone.
+        result = apply_to_code(content, rewrite)
+        changes = [f"Replaced {n}× {label}" for label, n in counts.items()]
         return result, changes

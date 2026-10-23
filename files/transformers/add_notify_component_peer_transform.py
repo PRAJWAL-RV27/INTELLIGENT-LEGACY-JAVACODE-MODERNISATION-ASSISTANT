@@ -57,7 +57,7 @@ class AddNotifyComponentPeerTransformer(BaseTransformer):
             changes.append("Converted addNotify(ComponentPeer) to initializeComponent()")
 
         # ---------- HANDLE DIRECT CALLS ----------
-        call_pattern = r'(\b\w+\b)\.addNotify\s*\(([\s\S]*?)\)\s*;'
+        call_pattern = r'(?<![\w.])(?!super\b|this\b)(\w+)\.addNotify\s*\(\s*([^)\s][^)]*)\)\s*;'  # needs a non-empty argument; never super./this.
         call_matches = list(re.finditer(call_pattern, content))
 
         for match in reversed(call_matches):

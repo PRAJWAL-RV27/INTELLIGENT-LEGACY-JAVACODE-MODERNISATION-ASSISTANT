@@ -27,6 +27,7 @@ Safety guarantee
   Java 21.  The developer must update call-sites where the removed type was
   actually used; those are flagged by the compiler after this step.
 """
+import re
 from .base_transformer import BaseTransformer
 from config import REMOVED_IMPORTS
 
@@ -87,4 +88,81 @@ class ImportCleanerTransformer(BaseTransformer):
             if not matched:
                 new_lines.append(line)
 
-        return "\n".join(new_lines), changes
+        result = "\n".join(new_lines)
+
+        # ---- rewrite call sites of sun.misc.BASE64Encoder / BASE64Decoder ----
+        if any("BASE64" in c for c in changes):
+            result, call_changes = self._rewrite_base64_calls(result)
+            changes.extend(call_changes)
+
+        return result, changes
+
+    @staticmethod
+    def _rewrite_base64_calls(src: str) -> tuple[str, list[str]]:
+        changes: list[str] = []
+
+        # new BASE64Encoder().encode(X)  /  encodeBuffer(X)
+        new_src, n = re.subn(
+            r'new\s+(?:sun\.misc\.)?BASE64Encoder\s*\(\s*\)\s*\.\s*encode(?:Buffer)?\s*\(',
+            'Base64.getEncoder().encodeToString(', src)
+        if n:
+            changes.append(f"Rewrote {n}x new BASE64Encoder().encode(..) -> Base64.getEncoder().encodeToString(..)")
+        src = new_src
+
+        # new BASE64Decoder().decodeBuffer(X)
+        new_src, n = re.subn(
+            r'new\s+(?:sun\.misc\.)?BASE64Decoder\s*\(\s*\)\s*\.\s*decodeBuffer\s*\(',
+            'Base64.getDecoder().decode(', src)
+        if n:
+            changes.append(f"Rewrote {n}x new BASE64Decoder().decodeBuffer(..) -> Base64.getDecoder().decode(..)")
+        src = new_src
+
+        # Variable form:  BASE64Encoder e = new BASE64Encoder();  e.encode(x)
+        for cls, meth, repl, label in (
+            ("BASE64Encoder", r"encode(?:Buffer)?", "Base64.getEncoder().encodeToString(", "encoder"),
+            ("BASE64Decoder", r"decodeBuffer",      "Base64.getDecoder().decode(",         "decoder"),
+        ):
+            decl = re.compile(
+                r'^[ \t]*(?:(?:private|public|protected|static|final|volatile)\s+)*' + cls + r'\s+(\w+)\s*=\s*new\s+' + cls + r'\s*\(\s*\)\s*;[ \t]*\r?\n',
+                re.M)
+            for m in list(decl.finditer(src)):
+                var = m.group(1)
+                src = src.replace(m.group(0), "", 1)
+                src, k = re.subn(r'\b' + re.escape(var) + r'\s*\.\s*' + meth + r'\s*\(', repl, src)
+                changes.append(f"Rewrote BASE64 {label} variable `{var}` ({k} call(s))")
+
+        src = ImportCleanerTransformer._fix_unreachable_ioexception_catch(src, changes)
+        return src, changes
+
+    @staticmethod
+    def _fix_unreachable_ioexception_catch(src: str, changes: list[str]) -> str:
+        """BASE64Decoder.decodeBuffer() threw IOException; Base64.decode() does not.
+        A try-block that only called it would now fail to compile with
+        'exception IOException is never thrown'. Widen that catch to Exception."""
+        io_markers = ("read", "write", "File", "Stream", "Reader", "Writer",
+                      "close(", "new IOException", "Files.", "Socket", "URL", "flush")
+        pos = 0
+        try_re = re.compile(r'\btry\s*\{')
+        catch_re = re.compile(r'\s*catch\s*\(\s*(?:java\.io\.)?IOException\s+(\w+)\s*\)')
+        while True:
+            m = try_re.search(src, pos)
+            if not m:
+                break
+            depth, i = 0, m.end() - 1
+            while i < len(src):
+                if src[i] == "{":
+                    depth += 1
+                elif src[i] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                i += 1
+            body = src[m.end():i]
+            c = catch_re.match(src, i + 1)
+            if (c and "Base64.getDecoder().decode(" in body
+                    and not any(k in body for k in io_markers)):
+                new = f"\n{' ' * 0}".strip("\n") + c.group(0).replace("java.io.IOException", "Exception").replace("IOException", "Exception")
+                src = src[:c.start()] + new + src[c.end():]
+                changes.append("Widened catch (IOException) to catch (Exception) because Base64.decode() no longer throws IOException")
+            pos = m.end()
+        return src
