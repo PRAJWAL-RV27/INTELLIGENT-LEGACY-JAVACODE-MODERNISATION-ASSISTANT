@@ -87,6 +87,26 @@ class SequencedListReverseTransformer:
             declared_type = match.group("type")
 
             # ----------------------------------------------------------
+            # The source must really be a List. For a Set / Deque the code
+            # `List<T> x = set.reversed();` does not compile (reversed() of a
+            # LinkedHashSet is a SequencedSet, not a List).
+            # ----------------------------------------------------------
+            decl_types = {
+                m.group(1)
+                for m in re.finditer(
+                    r"(?<![\w$.])([A-Za-z_$][\w$]*)(?:\s*<[^;(){}=]*?>)?\s+"
+                    + re.escape(source)
+                    + r"\s*(?:=|;|,|\)|:)",
+                    content[: match.start()],
+                )
+                if m.group(1) not in {"return", "else", "new", "throw", "case"}
+            }
+            if not decl_types or not decl_types <= {
+                "List", "ArrayList", "LinkedList", "Vector"
+            }:
+                return match.group(0)
+
+            # ----------------------------------------------------------
             # Conservative safety check:
             #
             # If the source list is modified later, the old code had
