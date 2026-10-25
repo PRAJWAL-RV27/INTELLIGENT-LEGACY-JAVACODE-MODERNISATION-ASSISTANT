@@ -37,6 +37,26 @@ from transformers.sequenced_map_first_entry_transform import (
     SequencedMapFirstEntryTransformer,
 )
 
+from transformers.string_builder_repeat_transform import (
+    StringBuilderRepeatTransformer,
+)
+
+from transformers.string_indexof_range_transform import (
+    StringIndexOfRangeTransformer,
+)
+
+from transformers.list_reverse_loop_transform import (
+    ListReverseLoopTransformer,
+)
+
+from transformers.sequenced_reverse_iteration_transform import (
+    SequencedReverseIterationTransformer,
+)
+
+from transformers.linkedhashmap_put_last_transform import (
+    LinkedHashMapPutLastTransformer,
+)
+
 OPTIONAL_TRANSFORMERS = [
     # Existing optional transformations
     LinkedListGetFirstTransformer(),
@@ -47,5 +67,12 @@ OPTIONAL_TRANSFORMERS = [
     SequencedValuesTransformer(),
     SequencedKeySetTransformer(),
     SequencedEntrySetTransformer(),
-    SequencedMapFirstEntryTransformer()
+    SequencedMapFirstEntryTransformer(),
+
+    # More Java 21 performance-aware transformations
+    StringBuilderRepeatTransformer(),
+    StringIndexOfRangeTransformer(),
+    ListReverseLoopTransformer(),
+    SequencedReverseIterationTransformer(),
+    LinkedHashMapPutLastTransformer(),
 ]
