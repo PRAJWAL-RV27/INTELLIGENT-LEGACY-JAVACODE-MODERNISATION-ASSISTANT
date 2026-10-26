@@ -57,6 +57,26 @@ from transformers.linkedhashmap_put_last_transform import (
     LinkedHashMapPutLastTransformer,
 )
 
+from transformers.sequenced_last_element_transform import (
+    SequencedLastElementTransformer,
+)
+
+from transformers.string_repeat_concat_transform import (
+    StringRepeatConcatTransformer,
+)
+
+from transformers.stringbuilder_compare_transform import (
+    StringBuilderCompareTransformer,
+)
+
+from transformers.hexformat_transform import (
+    HexFormatTransformer,
+)
+
+from transformers.read_all_bytes_transform import (
+    ReadAllBytesTransformer,
+)
+
 OPTIONAL_TRANSFORMERS = [
     # Existing optional transformations
     LinkedListGetFirstTransformer(),
@@ -75,4 +95,11 @@ OPTIONAL_TRANSFORMERS = [
     ListReverseLoopTransformer(),
     SequencedReverseIterationTransformer(),
     LinkedHashMapPutLastTransformer(),
+
+    # Newer-API performance-aware transformations (Java 9 to 21)
+    SequencedLastElementTransformer(),
+    StringRepeatConcatTransformer(),
+    StringBuilderCompareTransformer(),
+    HexFormatTransformer(),
+    ReadAllBytesTransformer(),
 ]
