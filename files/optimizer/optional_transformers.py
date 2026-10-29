@@ -77,6 +77,42 @@ from transformers.read_all_bytes_transform import (
     ReadAllBytesTransformer,
 )
 
+from transformers.collection_empty_transform import (
+    CollectionEmptyTransformer,
+)
+from transformers.sequential_stream_foreach_transform import (
+    SequentialStreamForEachTransformer,
+)
+from transformers.string_replaceall_transform import (
+    StringReplaceAllTransformer,
+)
+
+from transformers.string_matches_equals_transform import (
+    StringMatchesEqualsTransformer,
+)
+
+from transformers.collections_sort_transform import (
+    CollectionsSortTransformer,
+)
+from transformers.stringbuilder_append_valueof_transform import (
+    StringBuilderAppendValueOfTransformer,
+)
+
+from transformers.arraycopy_transform import ArrayCopyTransformer
+from transformers.array_mismatch_transform import ArraysMismatchTransformer
+from transformers.files_mismatch_transform import FilesMismatchTransformer
+from transformers.stream_transfer_transform import StreamTransferTransformer
+from transformers.bytearray_write_to_transform import ByteArrayWriteToTransformer
+from transformers.map_get_or_default_transform import MapGetOrDefaultTransformer
+from transformers.remove_if_transform import RemoveIfTransformer
+from transformers.collection_add_all_transform import CollectionAddAllTransformer
+from transformers.string_builder_loop_transform import StringBuilderLoopTransformer
+from transformers.path_of_transform import PathOfTransformer
+from transformers.optional_is_empty_transform import OptionalIsEmptyTransformer
+from transformers.string_formatted_transform import StringFormattedTransformer
+from transformers.files_read_string_transform import FilesReadStringTransformer
+from transformers.stringbuilder_is_empty_transform import StringBuilderIsEmptyTransformer
+
 OPTIONAL_TRANSFORMERS = [
     # Existing optional transformations
     LinkedListGetFirstTransformer(),
@@ -102,4 +138,26 @@ OPTIONAL_TRANSFORMERS = [
     StringBuilderCompareTransformer(),
     HexFormatTransformer(),
     ReadAllBytesTransformer(),
+
+    SequentialStreamForEachTransformer(),
+    StringReplaceAllTransformer(),
+    StringMatchesEqualsTransformer(),
+    CollectionsSortTransformer(),
+    StringBuilderAppendValueOfTransformer(),
+
+    # Additional performance-aware transformations
+    ArrayCopyTransformer(),
+    ArraysMismatchTransformer(),
+    FilesMismatchTransformer(),
+    StreamTransferTransformer(),
+    ByteArrayWriteToTransformer(),
+    MapGetOrDefaultTransformer(),
+    RemoveIfTransformer(),
+    CollectionAddAllTransformer(),
+    StringBuilderLoopTransformer(),
+    PathOfTransformer(),
+    OptionalIsEmptyTransformer(),
+    StringFormattedTransformer(),
+    FilesReadStringTransformer(),
+    StringBuilderIsEmptyTransformer(),
 ]
