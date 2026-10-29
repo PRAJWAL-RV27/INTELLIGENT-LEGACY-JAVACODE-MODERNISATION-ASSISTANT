@@ -72,6 +72,14 @@ Examples:
         ),
     )
 
+    parser.add_argument(
+        "--target-java-version",
+        type=int,
+        choices=range(8, 22),
+        default=21,
+        help="Target Java version for optional transformations (default: 21)",
+    )
+
     return parser.parse_args()
 
 
@@ -121,6 +129,7 @@ def main() -> None:
     print(f"  Dry run     : {args.dry_run}")
     print(f"  Verbose     : {args.verbose}")
     print(f"  Optimizer   : {args.optimize}")
+    print(f"  Target Java : {args.target_java_version}")
     print()
 
     # ---------------------------------------------------------
@@ -150,6 +159,7 @@ def main() -> None:
         optimizer = OptionalOptimizationPipeline(
             min_runtime_improvement_percent=5.0,
             min_memory_improvement_percent=0.0,
+            target_java_version=args.target_java_version,
         )
 
         print("  Performance-aware optimization: ENABLED")
