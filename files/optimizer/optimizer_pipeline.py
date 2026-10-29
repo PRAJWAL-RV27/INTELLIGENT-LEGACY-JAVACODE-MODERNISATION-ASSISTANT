@@ -8,6 +8,7 @@ decision engine.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Collection, Optional
 
 from .optional_optimizer import (
     OptionalOptimizer,
@@ -34,6 +35,8 @@ class OptionalOptimizationPipeline:
         self,
         min_runtime_improvement_percent: float = 5.0,
         min_memory_improvement_percent: float = 0.0,
+        target_java_version: int = 21,
+        enabled_transformers: Optional[Collection[str]] = None,
     ) -> None:
 
         self.optimizer = OptionalOptimizer(
@@ -45,7 +48,23 @@ class OptionalOptimizationPipeline:
             ),
         )
 
-        self.transformers = OPTIONAL_TRANSFORMERS
+        allowed = set(enabled_transformers) if enabled_transformers is not None else None
+        configured = []
+        seen_names: set[str] = set()
+        for transformer in OPTIONAL_TRANSFORMERS:
+            name = getattr(transformer, "NAME", type(transformer).__name__)
+            if name in seen_names:
+                continue
+            if allowed is not None and name not in allowed:
+                continue
+            configure = getattr(transformer, "configure", None)
+            if configure is not None:
+                configure(target_java_version=target_java_version)
+            seen_names.add(name)
+            configured.append(transformer)
+
+        self.target_java_version = target_java_version
+        self.transformers = configured
 
     def transform(
         self,
@@ -82,6 +101,22 @@ class OptionalOptimizationPipeline:
                 candidate=candidate_source,
             ) -> str:
                 return candidate
+
+            if getattr(transformer, "requires_performance_evaluation", True) is False:
+                result = OptimizationResult(
+                    applied=True,
+                    candidate_name=transformer.NAME,
+                    original_source=current_source,
+                    final_source=candidate_source,
+                    reason=(
+                        "Semantic-only modernization applied for target "
+                        f"Java {self.target_java_version}."
+                    ),
+                    details=changes,
+                )
+                results.append(result)
+                current_source = candidate_source
+                continue
 
             result = self.optimizer.optimize(
                 source_code=current_source,

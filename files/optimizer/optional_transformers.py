@@ -112,6 +112,17 @@ from transformers.optional_is_empty_transform import OptionalIsEmptyTransformer
 from transformers.string_formatted_transform import StringFormattedTransformer
 from transformers.files_read_string_transform import FilesReadStringTransformer
 from transformers.stringbuilder_is_empty_transform import StringBuilderIsEmptyTransformer
+from transformers.strictmath_tau_transform import (
+    StrictMathTauTransformer,
+)
+
+from transformers.math_abs_exact_transform import (
+    MathAbsExactTransformer,
+)
+
+from transformers.math_ceil_div_transform import (
+    MathCeilDivTransformer,
+)
 
 OPTIONAL_TRANSFORMERS = [
     # Existing optional transformations
@@ -160,4 +171,8 @@ OPTIONAL_TRANSFORMERS = [
     StringFormattedTransformer(),
     FilesReadStringTransformer(),
     StringBuilderIsEmptyTransformer(),
+
+    StrictMathTauTransformer(),
+    MathAbsExactTransformer(),
+    MathCeilDivTransformer(),
 ]
